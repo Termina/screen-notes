@@ -6,7 +6,18 @@ Screen notes
 
 ### Usage
 
+```bash
+yarn
+yarn electron glass/
+```
 
+During development:
+
+```bash
+env=dev yarn electron glass/
+```
+
+which will instead connect to http://:localhost:7000
 
 ### Workflow
 
