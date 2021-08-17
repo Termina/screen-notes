@@ -14,9 +14,9 @@ function createWindow () {
   win.show()
 
   if (process.env.env === 'dev') {
-    win.loadURL('http://localhost:7000')
+    win.loadURL('http://localhost:3000')
   } else {
-    win.loadURL('http://repo.mvc-works.org/screen-notes')
+    win.loadURL('http://r.tiye.me/mvc-works/screen-notes')
   }
 }
 

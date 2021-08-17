@@ -21,7 +21,7 @@ which will instead connect to http://:localhost:7000
 
 ### Workflow
 
-Workflow https://github.com/mvc-works/calcit-workflow
+Workflow https://github.com/calcit-lang/respo-calcit-workflow
 
 ### License
 
