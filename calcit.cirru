@@ -50,56 +50,67 @@
           :schema $ quote $ Fn (List Note) (-> respo.schema/Component) (:features :js-ffi)
         'comp-note $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-note (note)
-            div
-              {}
-                :style $ merge ui/row $ {} (:position :absolute) (:background-color |#fffbe6) (:box-shadow "|0 2px 8px rgba(0,0,0,0.15)") (:padding 4)
-                  :top $ :y note
-                  :left $ :x note
-                :draggable true
-                :on-click $ fn (e d!)
-                  hint-fn $ Fn respo.schema/RespoEvent
-                    Fn schema/Action (-> Unit) (:features :state :io)
-                    -> Unit
-                    :features :js-ffi :state :io
-                  .stop-propagation! $ event-host $ :event e
-                :on-dragstart $ fn (e d!)
-                  hint-fn $ Fn respo.schema/RespoEvent
-                    Fn schema/Action (-> Unit) (:features :state :io)
-                    -> Unit
-                    :features :js-ffi :state :io
-                  let
-                      event $ mouse-event-host $ :event e
-                    d! $ schema/Action :begin-drag (:id note) event.:client-x event.:client-y
-                :on-dragend $ fn (e d!)
-                  hint-fn $ Fn respo.schema/RespoEvent
-                    Fn schema/Action (-> Unit) (:features :state :io)
-                    -> Unit
-                    :features :state :io
-                  d! $ schema/Action :cancel-drag
-              input $ {}
-                :value $ :text note
-                :placeholder |Note
-                :style $ merge ui/input $ {} (:width 160)
-                :on-input $ fn (e d!)
-                  hint-fn $ Fn respo.schema/RespoEvent
-                    Fn schema/Action (-> Unit) (:features :state :io)
-                    -> Unit
-                    :features :js-ffi :state :io
-                  d! $ schema/Action :update-note (:id note) (event-value e)
-              button $ {} (:inner-text "|×") (:title "|Delete note")
-                :on-click $ fn (e d!)
-                  hint-fn $ Fn respo.schema/RespoEvent
-                    Fn schema/Action (-> Unit) (:features :state :io)
-                    -> Unit
-                    :features :js-ffi :state :io
-                  .stop-propagation! $ event-host $ :event e
-                  d! $ schema/Action :remove-note $ :id note
+            [] (effect-focus)
+              div
+                {}
+                  :style $ merge ui/row $ {} (:position :absolute) (:background-color |#fffbe6) (:box-shadow "|0 2px 8px rgba(0,0,0,0.15)") (:padding 4)
+                    :top $ :y note
+                    :left $ :x note
+                  :draggable true
+                  :on-click $ fn (e d!)
+                    hint-fn $ Fn respo.schema/RespoEvent
+                      Fn schema/Action (-> Unit) (:features :state :io)
+                      -> Unit
+                      :features :js-ffi :state :io
+                    .stop-propagation! $ event-host $ :event e
+                  :on-dragstart $ fn (e d!)
+                    hint-fn $ Fn respo.schema/RespoEvent
+                      Fn schema/Action (-> Unit) (:features :state :io)
+                      -> Unit
+                      :features :js-ffi :state :io
+                    let
+                        event $ mouse-event-host $ :event e
+                      d! $ schema/Action :begin-drag (:id note) event.:client-x event.:client-y
+                  :on-dragend $ fn (e d!)
+                    hint-fn $ Fn respo.schema/RespoEvent
+                      Fn schema/Action (-> Unit) (:features :state :io)
+                      -> Unit
+                      :features :state :io
+                    d! $ schema/Action :cancel-drag
+                input $ {}
+                  :value $ :text note
+                  :placeholder |Note
+                  :style $ merge ui/input $ {} (:width 160)
+                  :on-input $ fn (e d!)
+                    hint-fn $ Fn respo.schema/RespoEvent
+                      Fn schema/Action (-> Unit) (:features :state :io)
+                      -> Unit
+                      :features :js-ffi :state :io
+                    d! $ schema/Action :update-note (:id note) (event-value e)
+                button $ {} (:inner-text "|×") (:title "|Delete note")
+                  :on-click $ fn (e d!)
+                    hint-fn $ Fn respo.schema/RespoEvent
+                      Fn schema/Action (-> Unit) (:features :state :io)
+                      -> Unit
+                      :features :js-ffi :state :io
+                    .stop-propagation! $ event-host $ :event e
+                    d! $ schema/Action :remove-note $ :id note
           :examples $ []
           :schema $ quote $ Fn Note (-> respo.schema/Component) (:features :js-ffi)
+        'effect-focus $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defeffect effect-focus () (action el at?)
+            when (= action :mount)
+              match
+                js-nullish->option $ .query-selector el |input
+                (:some target) (.focus! target)
+                (:none) &unit
+            , &unit
+          :examples $ []
+          :schema $ quote $ Fn (-> respo.schema/Effect) (:features :js-ffi)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.comp.container
           :require (respo-ui.core :as ui)
-            respo.core :refer $ defcomp div span input button <> list-> event-value
+            respo.core :refer $ defcomp defeffect div span input button <> list-> event-value
             respo.comp.space :refer $ =<
             app.schema :as schema
             js-ffi.browser :refer $ mouse-event-host event-host
@@ -108,7 +119,7 @@
         '*drag $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defref *drag None
           :examples $ []
-          :schema $ quote $ Ref (Option app.main/Drag)
+          :schema $ quote $ Ref (Option Drag)
         '*next-id $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defref *next-id 0
           :examples $ []
