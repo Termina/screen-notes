@@ -21,17 +21,15 @@
                 {} $ :background-color |#f0f0f0
               list->
                 {} $ :style $ {} (:width |100%) (:height |100%)
-                map-indexed notes $ fn (idx raw)
-                  let
-                      note $ decode-map-as raw Note
-                    [] (:id note) (comp-note note)
+                map-indexed notes $ fn (idx note)
+                  [] (:id note) (comp-note note)
               button $ {} (:inner-text "|+ Note") (:style ui/button)
                 :style $ {} (:position :absolute) (:left 16) (:bottom 16)
                 :on-click $ fn (e d!)
                   d! $ schema/Action :add-note 40 $ + 40
                     * 24 $ count notes
           :examples $ []
-          :schema $ quote $ Fn (List Dynamic) (-> respo.schema/Component)
+          :schema $ quote $ Fn (List Note) (-> respo.schema/Component)
         'comp-note $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-note (note)
             div
@@ -58,21 +56,19 @@
         '*notes $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defref *notes ([])
           :examples $ []
-          :schema $ quote $ Ref (List Dynamic)
+          :schema $ quote $ Ref (List Note)
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (action)
             match action
               (:add-note x y)
-                reset! *notes $ conj @*notes $ {}
-                  :id $ str |note- $ count @*notes
-                  :x x
-                  :y y
-                  :text |
+                reset! *notes $ conj @*notes $ Note :id
+                  str |note- $ count @*notes
+                  , :x x :y y :text |
               (:update-note id text)
                 reset! *notes $ map-indexed @*notes $ fn (idx raw)
                   if
-                    = id $ .unwrap-or (get raw :id) |
-                    assoc raw :text text
+                    = id $ :id raw
+                    &struct:assoc raw :text text
                     , raw
             , &unit
           :examples $ []
@@ -108,7 +104,7 @@
           :require
             respo.core :refer $ render-with!
             respo.ffi.browser :refer $ query-selector
-            app.comp.container :refer $ comp-container
+            app.comp.container :refer $ comp-container Note
             app.schema :as schema
             |./calcit.build-errors :default build-errors
     'app.schema $ %{} 'FileEntry
